@@ -1,11 +1,11 @@
 # from pandas_highcharts.display import display_charts
 import pandas as pd
 import sqlite3
-from highcharts import Highchart
+# from highcharts import Highchart
 from flask import Flask, session, redirect, url_for, escape, request, render_template, jsonify
 
 
-chart = Highchart()
+# chart = Highchart()
 
 app = Flask(__name__)
 
@@ -23,7 +23,7 @@ def data():
     for i, coin in enumerate(results):
         # cursor.execute("SELECT 1000*timestamp, measure from measures")
 
-        sql = "SELECT coinname, 1000*epochs, total from coins"
+        sql = "SELECT coinname, epochs, total from coins"
 
         # df = pd.read_sql_query(sql)
         # cursor.execute(("SELECT '%s', 1000*epochs, total from %s" % (coin ,coin)))
@@ -85,7 +85,7 @@ options = {
     }
 }
 
-chart.set_dict_options(options)
+# chart.set_dict_options(options)
 # chart.set_options('chart', {'inverted': False})
 # chart.set_options('chart', {'resetZoomButton': {'relativeTo': 'plot', 'position': {'x': 0,'y': -30}}})
 # chart.set_options('xAxis', {'events': {'afterBreaks': 'function(e){return}'}})
@@ -120,8 +120,9 @@ def index1(chartid='chart_ID', chart_type='line', chart_height=640):
     # init plist list of lists
     plist = [[] for i in range(len(coins))]
 
-    dates = df['date'].values.tolist()
-    # df['dates'] = pd.to_datetime(df['date']/1000,unit='s')
+    # dates = df['date'].values.tolist()
+    df['dates'] = pd.to_datetime(df['date'], unit='s')
+    dates = df['dates'].dt.strftime('%Y/%m/%d').tolist()
 
     # dates = pd.to_datetime(df['dates'].unique()).tolist()
 
@@ -147,11 +148,12 @@ def index1(chartid='chart_ID', chart_type='line', chart_height=640):
 
     series = "[{name: '" + coins[0] + "' ,data: " + str(plist[0]) + "},{name: '" + coins[1] + "' ,data: " + str(plist[1]) + "}]"
 
-    title = {"text": 'Github Commits'}
+    # title = {"text": 'Github Commits'}
+    title = "Github Commits"
     xaxisx = {"categories": dates}
     yAxis = {"title": {"text": 'Commits'}}
     # return render_template('chart2.html', chartID=chartid, chart=chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
-    return render_template('chart2.html', chartID=chartid, series=series, title=title, xAxis=dates)
+    return render_template('chart2.html', chartID=chartid, series=series, title=title, xAxis=dates, yAxis="0",chart=chart)
 
 # display_charts(df, chart_type='stock')
 
