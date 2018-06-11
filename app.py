@@ -3,6 +3,7 @@ import pandas as pd
 import sqlite3
 # from highcharts import Highchart
 from flask import Flask, session, redirect, url_for, escape, request, render_template, jsonify
+import json
 
 
 # chart = Highchart()
@@ -23,7 +24,7 @@ def data():
     for i, coin in enumerate(results):
         # cursor.execute("SELECT 1000*timestamp, measure from measures")
 
-        sql = "SELECT coinname, epochs, total from coins"
+        sql = "SELECT coinname, 1000*epochs, total from coins"
 
         # df = pd.read_sql_query(sql)
         # cursor.execute(("SELECT '%s', 1000*epochs, total from %s" % (coin ,coin)))
@@ -114,17 +115,27 @@ def index1(chartid='chart_ID', chart_type='line', chart_height=640):
     labels = ['coin','date','total']
 
     df = pd.DataFrame.from_records(res1, columns=labels)
+    pd.options.display.float_format = '{:,.0f}'.format
 
     coins = df['coin'].drop_duplicates().values.tolist()
 
     # init plist list of lists
     plist = [[] for i in range(len(coins))]
+    json_data = [[] for i in range(len(coins))]
 
+    # use unix time format
     # dates = df['date'].values.tolist()
-    df['dates'] = pd.to_datetime(df['date'], unit='s')
-    dates = df['dates'].dt.strftime('%Y/%m/%d').tolist()
+
+    # dateint = df['date'].fillna(0).astype(int).values.tolist()
+    # change date format to m-d-Y if needed
+    # df['dates'] = pd.to_datetime(df['date'], unit='s')
+    # dates = df['dates'].dt.strftime('%m-%d-%Y').tolist()
 
     # dates = pd.to_datetime(df['dates'].unique()).tolist()
+
+    # change date to INT as highcharts expects
+
+    df['date'] = df['date'].astype(int)
 
     totals = df['total'].values.tolist()
 
@@ -132,6 +143,9 @@ def index1(chartid='chart_ID', chart_type='line', chart_height=640):
 
         date1 = df[df['coin'].isin([row])]
         plist[x] = date1['total'].values.tolist()
+
+        json_data[x] = date1[['date', 'total']].values.tolist()
+
 
         # plist.append(df[df['coin'].isin([row])].values.tolist())
     # try:
@@ -144,16 +158,17 @@ def index1(chartid='chart_ID', chart_type='line', chart_height=640):
     #    return render_template("nochart.html")
 
     chart = {"renderTo": chartid, "type": chart_type, "height": chart_height}
-    series = [{"name": coins[0], "data": plist[0]}, {"name": coins[1], "data": plist[1]}]
 
-    series = "[{name: '" + coins[0] + "' ,data: " + str(plist[0]) + "},{name: '" + coins[1] + "' ,data: " + str(plist[1]) + "}]"
+    series = "[{name: '" + coins[0] + "' ,data: " + str(json_data[0]) + "},{name: '" + coins[
+        1] + "' ,data: " + str(json_data[1]) + "} ]"
 
-    # title = {"text": 'Github Commits'}
     title = "Github Commits"
-    xaxisx = {"categories": dates}
-    yAxis = {"title": {"text": 'Commits'}}
-    # return render_template('chart2.html', chartID=chartid, chart=chart, series=series, title=title, xAxis=xAxis, yAxis=yAxis)
-    return render_template('chart2.html', chartID=chartid, series=series, title=title, xAxis=dates, yAxis="0",chart=chart)
+    subtitle = "Source: Github API"
+    xAxis = "Date (Weekly)"
+
+
+    return render_template('chart2.html', chartID=chartid, series=series, title=title, xAxis=xAxis, yAxis="Commits", yAxis2="Commits",
+                           chart=chart, subtitle=subtitle)
 
 # display_charts(df, chart_type='stock')
 

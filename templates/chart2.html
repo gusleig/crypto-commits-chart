@@ -22,36 +22,82 @@
 
 <body>
 <h2>first chart</h2>
-<div id="{{ chartID|safe }}"  class="chart" style="height: 300px"></div>
+<div id="{{ chartID|safe }}"  class="chart" style="height: 300px;width:800px;"></div>
 
 <script>
 	var chart_id = {{ chartID|safe }}
 	var series = {{ series|safe }}
 	var title = "{{ title|safe }}"
-	var xAxis = {{ xAxis|safe }}
-	var yAxis = {{ yAxis|safe }}
-	var chart = {{ chart|safe }}
+  var subtitle = "{{ subtitle|safe }}"
+	var xAxis = "{{ xAxis|safe }}"
+	var yAxis = "{{ yAxis|safe }}"
+  var yAxis2 = "{{ yAxis2|safe }}"
+
+  var chart = {{ chart|safe }}
+
+  var now = new Date();
+  now.setHours(now.getHours()) + Math.round(now.getMinutes());
+  now.setMinutes(0);
+  var utc_timestamp_today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  var utc_timestamp_3moFromNow = Date.UTC(now.getFullYear(), (now.getMonth() + 3), now.getDate(), 0, 0, 0, 0);
+
 </script>
-<script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-1.8.3.min.js"></script>
-<script type="text/javascript" src="http://cdn.hcharts.cn/highcharts/4.0.1/highcharts.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+
+
 <script type="text/javascript">
 $(document).ready(function() {
 
 $(function () {
     $(chart_id).highcharts({
         chart: {
+          type: 'line',
             zoomType: 'xy'
+        },
+        rangeSelector: {
+            selected: 1
         },
         title: {
             text: title
         },
         subtitle: {
-            text: 'Source: WorldClimate.com'
+            text: 'Source: Github API'
         },
         xAxis: [{
-            categories: xAxis,
-            crosshair: true
+            //categories: xAxis,
+            //min: 0,
+            //max: 9,
+            type: 'datetime',
+            allowDecimals : false,
+            endOnTick : false,
+            ordinal : false,
+            startOnTick : false,
+            dateTimeLabelFormats: { // don't display the dummy year
+              month: '%e. %b',
+              year: '%b'
+            },
+            title: {
+                text: xAxis
+            },
+
         }],
+        scrollbar: {
+            enabled: true,
+            barBackgroundColor: 'gray',
+            barBorderRadius: 7,
+            barBorderWidth: 0,
+            buttonBackgroundColor: 'gray',
+            buttonBorderWidth: 0,
+            buttonBorderRadius: 7,
+            trackBackgroundColor: 'none',
+            trackBorderWidth: 1,
+            trackBorderRadius: 8,
+            trackBorderColor: '#CCC'
+          },
         yAxis: [{ // Primary yAxis
             labels: {
                 format: '{value}',
@@ -60,14 +106,14 @@ $(function () {
                 }
             },
             title: {
-                text: 'Temperature',
+                text: yAxis,
                 style: {
                     color: Highcharts.getOptions().colors[1]
                 }
             }
         }, { // Secondary yAxis
             title: {
-                text: 'Rainfall',
+                text: yAxis2,
                 style: {
                     color: Highcharts.getOptions().colors[0]
                 }
@@ -92,7 +138,18 @@ $(function () {
             floating: true,
             backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
         },
-        series: series
+        plotOptions: {
+           column: {
+               pointPadding: 0.2,
+               borderWidth: 0.5
+           }
+       },
+        series: series,
+        navigation: {
+        buttonOptions: {
+            enabled: true
+        }
+    }
     });
 });
 });
