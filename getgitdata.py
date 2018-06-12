@@ -8,8 +8,6 @@ import configparser
 
 Config = configparser.ConfigParser()
 
-# ACCESS_TOKEN = '2a26cfa5a3af73c8ae60c0d873d1f24e365bc34c'
-
 
 def setup_config():
     Config.read("config.ini")

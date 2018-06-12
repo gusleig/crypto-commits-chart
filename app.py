@@ -18,6 +18,14 @@ COINS = {
     'ethereum': {
         'name': 'Ethereum',
         'url': 'https://api.github.com/repos/ethereum/go-ethereum/stats/commit_activity'
+    },
+    'EOS': {
+        'name': 'EOS',
+        'url': 'https://api.github.com/repos/EOSIO/eos/stats/commit_activity'
+    },
+    'TRON': {
+        'name': 'Tron',
+        'url': 'https://api.github.com/repos/tronprotocol/java-tron/stats/commit_activity'
     }
 }
 
@@ -64,7 +72,7 @@ def data():
 # data1, data2 = data()
 
 @app.route('/', methods=['POST', 'GET'])
-def index1(chartid='chart_ID', chart_type='line', chart_height=640):
+def index1(chartid='chart_ID', chart_type='line', chart_height=800):
 
     res1 = data()
 
@@ -111,12 +119,14 @@ def index1(chartid='chart_ID', chart_type='line', chart_height=640):
             # plist[1].append(int(row[2]))
     # except IndexError:
     #    return render_template("nochart.html")
+    series = ""
+    for x in enumerate(coins):
+
+        series += "{name: '" + coins[x[0]] + "' ,data: " + str(json_data[x[0]]) + "}, "
+
+    series = "[" + series + "]"
 
     chart = {"renderTo": chartid, "type": chart_type, "height": chart_height}
-
-    series = "[{name: '" + coins[0] + "' ,data: " + str(json_data[0]) + "},{name: '" + coins[
-        1] + "' ,data: " + str(json_data[1]) + "} ]"
-
     title = "Github Commits"
     subtitle = "Source: Github API"
     xAxis = "Date (Weekly)"
