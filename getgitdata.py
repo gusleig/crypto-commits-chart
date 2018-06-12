@@ -3,8 +3,13 @@ import sqlite3
 import json
 import datetime
 import requests
-
+import logging
 import configparser
+
+logging.basicConfig(format="%(asctime)s %(message)s",
+                    datefmt="%d.%m.%Y %H:%M:%S")
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 Config = configparser.ConfigParser()
 
@@ -32,6 +37,7 @@ def getdata(coinname, githuburl):
     token = Config.get("config", "ACCESS_TOKEN")
 
     if token == "":
+        logger.info("Missing Gethub Token in config.ini")
         return False
 
     headers = {'Authorization': 'token ' + token}
@@ -86,6 +92,7 @@ def getdata(coinname, githuburl):
         pass
 
     # save data to table
+    logger.info("Saved Data to DB: " + coinname.lower())
     ds.to_sql("coins", conn, if_exists="append")
     conn.close()
     return True

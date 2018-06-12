@@ -64,7 +64,7 @@ def data():
 
         # df.append(pd.DataFrame.from_records(results[i], columns=['coin', 'date', 'commits']), ignore_index=True)
         # df = pd.read_sql_query("select coinname, 1000*epochs, total from  coins;" , conn)
-
+        logger.info("Got DB data")
         return results
 
 
@@ -72,7 +72,7 @@ def data():
 # data1, data2 = data()
 
 @app.route('/', methods=['POST', 'GET'])
-def index1(chartid='chart_ID', chart_type='line', chart_height=800):
+def index1(chartid='chart_ID', chart_type='line', chart_width=1000):
 
     res1 = data()
 
@@ -126,13 +126,12 @@ def index1(chartid='chart_ID', chart_type='line', chart_height=800):
 
     series = "[" + series + "]"
 
-    chart = {"renderTo": chartid, "type": chart_type, "height": chart_height}
+    # chart = {"renderTo": chartid, "type": chart_type, "height": chart_height}
     title = "Github Commits"
     subtitle = "Source: Github API"
     xAxis = "Date (Weekly)"
 
-    return render_template('chart2.html', chartID=chartid, series=series, title=title, xAxis=xAxis, yAxis="Commits", yAxis2="Commits",
-                           chart=chart, subtitle=subtitle)
+    return render_template('chart2.html', chartID=chartid, series=series, title=title, xAxis=xAxis, yAxis="Commits", yAxis2="Commits", subtitle=subtitle, chartwd=chart_width, chart="0")
 
 # display_charts(df, chart_type='stock')
 
