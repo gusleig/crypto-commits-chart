@@ -1,4 +1,4 @@
-# highcharts2
+# Crypt Commits Chart
 
 This project aims to get Github commit data about cryptocurrencies and display a chart using highcharts
 
